@@ -1,22 +1,22 @@
 import React from 'react';
-import {Box, Button, Card, CardContent, Grid, Input, makeStyles, Typography} from "@material-ui/core";
 import {Container, Row, Col} from 'react-bootstrap';
 import './GameScreen.css'
 
 //IMPORT COMPONENT
 import GameMap from "../components/GameMap"
+import ScoreTab from "../components/ScoreTab";
 
 export default function GameScreen() {
 
   return (
     <Container fluid className="containerGameScreen" >
       <Row className="rowGameScreen">
-      <Col md={5}>
-          <Container fluid className="containerGameScreen">
+        <Col md={5}>
+          <Container>
             <Row className="rowGameTitle">Epinease Checker</Row>
-            <Row>
-              <Col>
-                <div className="cardGameScore"></div>
+            <Row >
+              <Col className="cardGameScore">
+                <ScoreTab/>
               </Col>
             </Row>
           </Container>

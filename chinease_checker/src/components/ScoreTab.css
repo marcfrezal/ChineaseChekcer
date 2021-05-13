@@ -1,0 +1,24 @@
+.scoreMainContainer {
+  height: 40vh;
+  width: 60vh;
+}
+
+.scoreRow {
+  height: 25%;
+  border-top : rgb(230, 230, 230) 3px solid;
+}
+
+.scoreRowTitle {
+  height: 20%;
+}
+
+.scoreCol {
+  color : darkblue;
+  font-weight: 800;
+}
+
+.scoreColTitle {
+  color : darkblue;
+  font-weight: 800;
+  font-size: 4vh;
+}

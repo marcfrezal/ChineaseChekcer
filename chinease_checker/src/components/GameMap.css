@@ -1,11 +1,12 @@
-.row{
+.rowHex{
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
   margin-top: -1.4vh;
 }
-.row:nth-child(even){
+
+.rowHex:nth-child(even){
   margin-left: 4.5vh;
 }
 
@@ -39,7 +40,7 @@
   height: 6vh;
   width: 6vh;
   background: white;
-  color: white;
+  color: black;
   margin: 1px;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   transition: 2s;
@@ -59,12 +60,61 @@
 .hexagon:hover{
   transition: 0s;
   cursor: pointer;
-  background-color: lightgreen;
+  background-color: rgb(226, 226, 226);
 }
 
-.pion {
+.red {
   height: 3vh;
   width: 3vh;
-  background-color: lightpink;
+  background-color: red;
+  border-radius: 100vh;
+}
+
+.blue {
+  height: 3vh;
+  width: 3vh;
+  background-color: blue;
+  border-radius: 100vh;
+} 
+
+.yellow{
+  height: 3vh;
+  width: 3vh;
+  background-color: yellow;
+  border-radius: 100vh;
+} 
+
+.green{
+  height: 3vh;
+  width: 3vh;
+  background-color: green;
+  border-radius: 100vh;
+} 
+
+.brown{
+  height: 3vh;
+  width: 3vh;
+  background-color: brown;
+  border-radius: 100vh;
+} 
+
+.pink{
+  height: 3vh;
+  width: 3vh;
+  background-color: pink;
+  border-radius: 100vh;
+} 
+
+.emptyCell {
+  height: 3vh;
+  width: 3vh;
+  background-color: rgb(247, 247, 247);
+  border-radius: 100vh;
+}
+
+.darkgrey {
+  height: 3vh;
+  width: 3vh;
+  background-color: darkgray;
   border-radius: 100vh;
 }

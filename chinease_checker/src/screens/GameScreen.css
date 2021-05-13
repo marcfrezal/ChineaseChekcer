@@ -13,7 +13,7 @@ body {
 }
 
 .rowGameTitle {
-    height: 30%;
+    height: 30vh;
     align-items: center;
     justify-content: center;
     color: #1E266D;
@@ -39,12 +39,9 @@ body {
 
 .cardGameScore {
     height: 40vh;
-    width: 58vh;
+    width: 60vh;
     background-color: white;
     border-radius: 5vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     background-color: white;
 }
 
