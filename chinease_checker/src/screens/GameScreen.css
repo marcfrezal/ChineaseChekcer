@@ -1,0 +1,53 @@
+body {
+    background-color: #eeeef7;
+}
+
+.containerGameScreen {
+    height: 102vh;
+    background-color: #eeeef7;
+}
+
+.rowGameScreen {
+    height: 100%;
+    background-color: #eeeef7;
+}
+
+.rowGameTitle {
+    height: 30%;
+    align-items: center;
+    justify-content: center;
+    color: #1E266D;
+    font-weight: 600;
+    font-size: 6vh;
+}
+
+.colGamePlate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cardGamePlate {
+    height: 90vh;
+    width: 110vh;
+    background-color: white;
+    border-radius: 5vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cardGameScore {
+    height: 40vh;
+    width: 58vh;
+    background-color: white;
+    border-radius: 5vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+}
+
+canvas {
+    border: 1px solid black;
+}
