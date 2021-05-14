@@ -9,6 +9,21 @@ type Cell = {
     id : number
 }
 
+// CellToWin Interface
+type AreaToWin = {
+    color : string,
+    colorChallenger : string,
+    id : number,
+    cells : number []
+}
+
+// Turn Interface
+type Turn  = {
+    prevPlayerColor : string,
+    actualPlayerColor : string
+}
+
+
 
 //Array to help visualize map
 // const cells : number[][] = [[0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
@@ -55,13 +70,23 @@ const hexaMap : Cell[][] = [[{ color : "black", isPion : false, id : 1},{ color 
                             [{ color : "black", isPion : false, id : 1},{ color : "black", isPion : false, id : 2},{ color : "black", isPion : false, id : 3},{ color : "black", isPion : false, id : 4},{ color : "black", isPion : false, id : 5},{ color : "black", isPion : false, id : 6},{ color : "pink", isPion : true, id : 7},{ color : "black", isPion : false, id : 8},{ color : "black", isPion : false, id : 9},{ color : "black", isPion : false, id : 10},{ color : "black", isPion : false, id : 11},{ color : "black", isPion : false, id : 12},{ color : "black", isPion : false, id : 13}],]
 
 
+/*
+** 
+**  INIT OF WIN AREAS
+**
+*/
+
+const areasToWin : AreaToWin[] = [{id : 1, color : "red", colorChallenger : "pink", cells : [6, 18, 19, 31, 32, 33, 43, 44, 45, 46]},
+                                  {id : 2, color : "brown", colorChallenger : "yellow", cells : [61, 62, 63, 64, 74, 75, 76, 88, 89, 101]},
+                                  {id : 3, color : "green", colorChallenger : "blue", cells : [127, 140, 141, 152, 153, 154, 165, 166, 167, 168]},
+                                  {id : 4, color : "pink", colorChallenger : "red", cells : [173, 174, 175, 176, 187, 188, 189, 200, 201, 214]},
+                                  {id : 5, color : "yellow", colorChallenger : "brown", cells : [118, 131, 132, 143, 144, 145, 156, 157, 158, 159]},
+                                  {id : 6, color : "blue", colorChallenger : "green", cells : [52, 53, 54, 55, 65, 66, 67, 79, 80, 92]}]
 
 
 //FUNCTION TO GET POSSIBLE POSITION TO MOVE WITH PION IF I % 2 == 0
 function GetPairCellsToMove(selectedCell, hexaMapState, oldCellToMove) {
     let cellsToMovePair : Cell[] = [];
-
-    console.log(oldCellToMove);
 
     for (let i = 0; i < hexaMapState.length; i++) {
         for (let j = 0; j < hexaMapState[i].length; j++) {
@@ -89,8 +114,6 @@ function GetPairCellsToMove(selectedCell, hexaMapState, oldCellToMove) {
 //FUNCTION TO GET POSSIBLE POSITION TO MOVE WITH PION IF I % 2 == 1
 function GetImpairCellsToMove(selectedCell, hexaMapState, oldCellToMove) {
     let cellsToMoveImpair : Cell[] = [];
-
-    console.log(oldCellToMove);
 
     for (let i = 0; i < hexaMapState.length; i++) {
         for (let j = 0; j < hexaMapState[i].length; j++) {
@@ -181,6 +204,20 @@ function InitIdsOfHexaMap(hexaMapState) {
 
 function SwitchPositionPions(fromCell, toCell, toCellsPositions, hexaMap) {
 
+    let isCellValid : boolean = false;
+
+    for (let l = 0; l < toCellsPositions.length; l++) {
+        if (toCell.id === toCellsPositions[l].id) {
+            isCellValid = true
+        }
+    }
+
+    if(!isCellValid) {
+        alert("Veuillez sélectionner une cellule valide");
+        return (false);
+    }
+        
+
     for (let i = 0; i < hexaMap.length; i++) {
         for (let j = 0; j < hexaMap[i].length; j++) {
             if (hexaMap[i][j].id === toCell.id) {
@@ -215,8 +252,106 @@ function SwitchPositionPions(fromCell, toCell, toCellsPositions, hexaMap) {
             }
         }
     }
+
+    return (true);
 }
 
+
+
+
+
+// FUNCTION TO CHECK IF PLAYER WIN THE GAME
+
+function DidPlayerWin(hexaMap) {
+
+    let red :number = 0;
+    let blue :number = 0;
+    let yellow: number = 0;
+    let green : number = 0;
+    let brown : number = 0;
+    let pink : number = 0;
+    
+    for (let i = 0; i < hexaMap.length; i++) {
+        for (let j = 0; j < hexaMap[i].length; j++) {
+            for (let l = 0; l < areasToWin.length; l++) {
+                for (let m = 0; m < areasToWin[l].cells.length; m++) {
+                    if (areasToWin[l].cells[m] === hexaMap[i][j].id) {
+                        switch(hexaMap[i][j].color) {
+                            case "red":
+                                if (areasToWin[l].colorChallenger === "red") {
+                                    red += 1;
+                                }
+                                break;
+                            case "brown":
+                                if (areasToWin[l].colorChallenger === "brown") {
+                                    brown += 1;
+                                }
+                                break;
+                            case "green":
+                                if (areasToWin[l].colorChallenger === "green") {
+                                    green += 1;
+                                }
+                                break;
+                            case "pink":
+                                if (areasToWin[l].colorChallenger === "pink") {
+                                    pink += 1;
+                                }
+                                break;
+                            case "yellow":
+                                if (areasToWin[l].colorChallenger === "yellow") {
+                                    yellow += 1;
+                                }
+                                break;
+                            case "blue":
+                                if (areasToWin[l].colorChallenger === "blue") {
+                                    blue += 1;
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (red === 10)
+        alert("RedPlayerWin")
+    if (blue === 10)
+        alert("BluePlayerWin")
+    if (green === 10)
+        alert("GreenPlayerWin")
+    if (yellow === 10)
+        alert("YellowPlayerWin")
+    if (brown === 10)
+        alert("BrownPlayerWin")
+    if (pink === 10)
+        alert("PinkPlayerWin")
+
+
+}
+
+
+
+//GET NEXT PLAYER TO MOVE
+function getNextPlayerToplay (selectedCell) {
+    switch (selectedCell.color) {
+        case "red":
+            return ("brown");
+        case "brown":
+            return ("green");
+        case "green":
+            return ("pink");
+        case "pink":
+            return ("yellow");
+        case "yellow":
+            return ("blue");
+        case "blue":
+            return ("red");
+        default:
+            return ("error");
+    }
+}
 
 // GAMEMAP FUNCTIONNAL COMPONENT
 export default function GameMap() {
@@ -224,12 +359,17 @@ export default function GameMap() {
     const [hexaMapState, setHexaMapState] = useState(InitIdsOfHexaMap(hexaMap));
     const [cellToMove, setCellToMove] = useState([]);
     const [oldCellToMove, setoldCellToMove] = useState([]);
-    const [mainCell, setMainCell] = useState({});
+    const [mainCell, setMainCell] = useState({id : 0, color : "", isPion : false});
+    const [turn , setTurn] = useState({prevPlayerColor : null, actualPlayerColor : "red"})
 
 
     const handleCellClick = (selectedCell) => {
         let cellsToMove : Cell[] = [];
         
+        if (selectedCell.color !== turn.actualPlayerColor) {
+            alert("Ce n'est pas avous de jouer!");
+            return;
+        }
         cellsToMove = SelectCellToMove(selectedCell, hexaMapState, oldCellToMove);
         setCellToMove(SelectCellToMove(selectedCell, hexaMapState, oldCellToMove));
         setoldCellToMove(cellsToMove);
@@ -238,10 +378,21 @@ export default function GameMap() {
     }
 
     const handleEmptyCellClick = (selectedEmptyCell) => {
-        if (cellToMove.length === 0) {
+        let isMoveDone : boolean = false;
+        let nextPlayerToPlay : string = null;
+
+       
+        if (cellToMove.length === 0 || mainCell === null) {
             alert("Veuillez sélectionner en premier une cellule avec un pion pour pouvoir jouer.");
+            return;
         }
-        SwitchPositionPions(mainCell, selectedEmptyCell, cellToMove, hexaMapState);
+        isMoveDone = SwitchPositionPions(mainCell, selectedEmptyCell, cellToMove, hexaMapState);
+        if (isMoveDone) {
+            nextPlayerToPlay = getNextPlayerToplay(selectedEmptyCell);
+            setTurn({prevPlayerColor : mainCell.color, actualPlayerColor : nextPlayerToPlay });
+            setMainCell(null);
+            DidPlayerWin(hexaMapState);
+        }
         setHexaMapState([...hexaMapState]);
     }
 
