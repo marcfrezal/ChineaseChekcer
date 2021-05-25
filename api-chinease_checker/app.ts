@@ -1,22 +1,27 @@
-const express = require('express');
+import express from 'express';
+
 const app = express();
-const http = require('http');
-const cors = require('cors');
-const bodyParser = require("body-parser");
+import http from 'http';
+import cors from 'cors';
+import bodyParser from "body-parser";
 
 app.use(bodyParser.json());
 app.use(cors());
 
+import { Server, Socket } from "socket.io";
 const server = http.createServer(app);
-const io = require('socket.io')(server, {
+const io = new Server(server, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
     }
 });
 
+import {database} from './firebase-config.js'
+
 app.get('/', (req, res) => {
-    res.send('Hello World!')
+    res.send('Hello World!');
+    // database.collection()
 })
 
 server.listen(3000, () => {
