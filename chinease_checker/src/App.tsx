@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 
-//Export Screens
+//Import Screens
 import GameScreen from './screens/GameScreen';
+import InitGameScreen from './screens/InitGameScreen';
 
-function App() {
+type Player = {
+    id : any,
+    color : string
+}
+
+export default function App() {
   return (
     <div className="App">
       <GameScreen/>
     </div>
   );
-}
+};
 
-export default App;

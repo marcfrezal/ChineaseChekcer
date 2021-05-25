@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {Container, Row} from 'react-bootstrap';
-import './GameMap.css'
+import './GameMap.css';
+import io from 'socket.io-client';
+import { fdatasync } from 'fs';
+
+console.log("test");
+const socket = io('http://localhost:9090', { transports : ['websocket'] , upgrade : false});
 
 // Cell Interface
 type Cell = {
@@ -92,7 +97,7 @@ function GetPairCellsToMove(selectedCell, hexaMapState, oldCellToMove) {
         for (let j = 0; j < hexaMapState[i].length; j++) {
             for (let l = 0; l < oldCellToMove.length; l++) {
                 if (hexaMapState[i][j].id === oldCellToMove[l].id && hexaMapState[i][j].color === "grey") {
-                    let cell = document.getElementById(hexaMapState[i][j].id)
+                    let cell = document.getElementById(hexaMapState[i][j].id);
                     cell.style.backgroundColor = "rgb(247, 247, 247)"; 
                 }
             }
@@ -119,7 +124,7 @@ function GetImpairCellsToMove(selectedCell, hexaMapState, oldCellToMove) {
         for (let j = 0; j < hexaMapState[i].length; j++) {
             for (let l = 0; l < oldCellToMove.length; l++) {
                 if (hexaMapState[i][j].id === oldCellToMove[l].id && hexaMapState[i][j].color === "grey") {
-                    let cell = document.getElementById(hexaMapState[i][j].id)
+                    let cell = document.getElementById(hexaMapState[i][j].id);
                     cell.style.backgroundColor = "rgb(247, 247, 247)"; 
                 }
             }
@@ -213,7 +218,6 @@ function SwitchPositionPions(fromCell, toCell, toCellsPositions, hexaMap) {
     }
 
     if(!isCellValid) {
-        alert("Veuillez sélectionner une cellule valide");
         return (false);
     }
         
@@ -361,39 +365,54 @@ export default function GameMap() {
     const [oldCellToMove, setoldCellToMove] = useState([]);
     const [mainCell, setMainCell] = useState({id : 0, color : "", isPion : false});
     const [turn , setTurn] = useState({prevPlayerColor : null, actualPlayerColor : "red"})
+    const [test, setTest] = useState("hello");
 
+    useEffect(() => {
+
+        socket.on('select', (data) => {
+            let cellsToMove : Cell[] = [];
+            console.log("hi")
+            cellsToMove = SelectCellToMove(data.selectedCell, hexaMapState, oldCellToMove);
+            console.log(cellsToMove);
+            setCellToMove(cellsToMove);
+            setoldCellToMove(cellsToMove);
+            setMainCell(data.selectedCell);
+            setHexaMapState([...hexaMapState]);
+            socket.off('move');
+            socket.off('select');
+        })
+
+        socket.on('move', (data) => {
+            let isMoveDone : boolean = SwitchPositionPions(data.mainCell, data.selectedEmptyCell, cellToMove, hexaMapState);
+            if (isMoveDone) {
+                let nextPlayerToPlay : any = getNextPlayerToplay(data.mainCell);
+                console.log(nextPlayerToPlay);
+                setTurn({prevPlayerColor : mainCell.color, actualPlayerColor : nextPlayerToPlay });
+                setMainCell({id : 0, color : "", isPion : false});
+                DidPlayerWin(hexaMapState);
+                socket.off('move');
+                socket.off('select');
+
+            }
+            setHexaMapState([...hexaMapState]);
+        })
+
+    })
 
     const handleCellClick = (selectedCell) => {
-        let cellsToMove : Cell[] = [];
-        
         if (selectedCell.color !== turn.actualPlayerColor) {
             alert("Ce n'est pas avous de jouer!");
             return;
         }
-        cellsToMove = SelectCellToMove(selectedCell, hexaMapState, oldCellToMove);
-        setCellToMove(SelectCellToMove(selectedCell, hexaMapState, oldCellToMove));
-        setoldCellToMove(cellsToMove);
-        setMainCell(selectedCell);
-        setHexaMapState([...hexaMapState]);
+        socket.emit('select', {selectedCell});
     }
 
     const handleEmptyCellClick = (selectedEmptyCell) => {
-        let isMoveDone : boolean = false;
-        let nextPlayerToPlay : string = null;
-
-       
         if (cellToMove.length === 0 || mainCell === null) {
             alert("Veuillez sélectionner en premier une cellule avec un pion pour pouvoir jouer.");
             return;
         }
-        isMoveDone = SwitchPositionPions(mainCell, selectedEmptyCell, cellToMove, hexaMapState);
-        if (isMoveDone) {
-            nextPlayerToPlay = getNextPlayerToplay(selectedEmptyCell);
-            setTurn({prevPlayerColor : mainCell.color, actualPlayerColor : nextPlayerToPlay });
-            setMainCell(null);
-            DidPlayerWin(hexaMapState);
-        }
-        setHexaMapState([...hexaMapState]);
+        socket.emit('move',  {selectedEmptyCell, mainCell});
     }
 
 

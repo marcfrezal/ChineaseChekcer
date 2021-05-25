@@ -11,7 +11,7 @@ export default function GameScreen() {
   return (
     <Container fluid className="containerGameScreen" >
       <Row className="rowGameScreen">
-        <Col md={5}>
+        {/* <Col md={5}>
           <Container>
             <Row className="rowGameTitle">Epinease Checker</Row>
             <Row >
@@ -20,8 +20,8 @@ export default function GameScreen() {
               </Col>
             </Row>
           </Container>
-        </Col>
-        <Col className="colGamePlate" md={7}>
+        </Col> */}
+        <Col className="colGamePlate" md={12}>
           <div className="cardGamePlate shadow">
             <GameMap/>
           </div>
