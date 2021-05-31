@@ -9,6 +9,7 @@ import {SocketContext} from '../context/socket';
 
 //IMPORT COMPONENTS
 import GameScreen from './GameScreen'
+import {PlayerData} from "../interfaces/intefaces";
 
 
 
@@ -36,8 +37,13 @@ export default function InitGameScreen() {
     })
 
     const handleSelectColor = (color: string) => {
-        // Generate or get roomId here
         setPlayer({id: playerID, color: color, roomId: 'room'});
+    }
+
+    const handleSelectRoom = (room: string) => {
+        const playerCpy = player as PlayerData;
+        playerCpy.roomId = room;
+        setPlayer(playerCpy);
     }
 
     const handleClickToPlay = () => {
@@ -60,6 +66,10 @@ export default function InitGameScreen() {
                     <option value={'pink'}>Rose</option>
                     <option value={'yellow'}>Jaune</option>
                     <option value={'blue'}>Bleu</option>
+                </Form.Control>
+                <Form.Label>RoomId</Form.Label>
+                <Form.Control as="input" onChange={e => handleSelectRoom(e.target.value)}>
+
                 </Form.Control>
             </Form.Group>
             <Button onClick={() => handleClickToPlay()}>Go play</Button>

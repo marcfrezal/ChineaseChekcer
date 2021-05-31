@@ -18,7 +18,7 @@ const io = new Server(server, {
     }
 });
 
-import {database} from './firebase-config.js'
+import {database} from './firebase-config'
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
@@ -27,6 +27,25 @@ app.get('/', (req, res) => {
 
 const playersArray: PlayerData[] = [];
 const rooms: Room[] = [];
+
+function getNextPlayerToplay (selectedCell) {
+    switch (selectedCell.color) {
+        case "red":
+            return ("brown");
+        case "brown":
+            return ("green");
+        case "green":
+            return ("pink");
+        case "pink":
+            return ("yellow");
+        case "yellow":
+            return ("blue");
+        case "blue":
+            return ("red");
+        default:
+            return ("error");
+    }
+}
 
 io.on('connection', (socket => {
     console.log(socket.id);
@@ -43,24 +62,26 @@ io.on('connection', (socket => {
             room.players.push(player.id);
         if (!playersArray.find(playerTmp => playerTmp.id === player.id))
             playersArray.push(player);
-        console.log('players ', playersArray);
-        console.log('rooms ', rooms);
         socket.join(player.roomId);
         socket.emit('getRoom', room.id);
         socket.emit("getPlayersArray", playersArray);
     });
 
     socket.on("select", function(data) {
-        console.log(data);
         io.emit("select", data);
     });
 
     socket.on("move", function(data) {
-        console.log(data);
         io.emit("move", data);
     });
 
+    socket.on('nextPlayer', ({roomId, nextPlayer}) => {
+        const room = rooms.find(room => room.id === roomId);
+        room.turn = nextPlayer;
+    });
+
     socket.on('getPlayer', () => {
+        console.log(socket.id);
        const playerObj = playersArray.find(player => player.id === socket.id);
        if (playerObj)
            io.to(playerObj.id).emit('loadPlayer', playerObj);
@@ -74,6 +95,22 @@ io.on('connection', (socket => {
             }
         }
     });
+
+    socket.on('saveMap', ({hexaMap, roomId}) => {
+        database.collection('maps').doc(roomId).set({roomId: roomId, map: JSON.stringify(hexaMap)})
+    })
+
+    socket.on('loadMap', async (roomId) => {
+        database.collection('maps').doc(roomId).get().then(data => {
+            const roomData = data.data();
+            if (roomData) {
+                const hexaMap = roomData.map;
+                const room = rooms.find(room => room.id === roomId);
+                io.to(socket.id).emit('map', {map: JSON.parse(hexaMap), roomTurn: room.turn});
+            }
+        });
+
+    })
 }));
 
 server.listen(3001, () => {

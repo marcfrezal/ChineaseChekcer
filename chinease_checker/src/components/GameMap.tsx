@@ -339,22 +339,31 @@ function DidPlayerWin(hexaMap) {
 
 //GET NEXT PLAYER TO MOVE
 function getNextPlayerToplay (selectedCell) {
+    let color;
     switch (selectedCell.color) {
         case "red":
-            return ("brown");
+            color = "brown";
+            break;
         case "brown":
-            return ("green");
+            color = "green";
+            break;
         case "green":
-            return ("pink");
+            color = "pink";
+            break;
         case "pink":
-            return ("yellow");
+            color = "yellow";
+            break;
         case "yellow":
-            return ("blue");
+            color = "blue";
+            break;
         case "blue":
-            return ("red");
+            color = "red";
+            break;
         default:
-            return ("error");
+            color = "error";
+            break;
     }
+    return color;
 }
 
 // GAMEMAP FUNCTIONNAL COMPONENT
@@ -373,6 +382,7 @@ export default function GameMap() {
 
     useEffect(() => {
         socket.emit('getPlayer');
+        socket.emit('loadMap', roomId);
     }, [])
 
     useEffect(() => {
@@ -394,10 +404,12 @@ export default function GameMap() {
             let isMoveDone : boolean = SwitchPositionPions(data.mainCell, data.selectedEmptyCell, cellToMove, hexaMapState);
             if (isMoveDone) {
                 let nextPlayerToPlay : any = getNextPlayerToplay(data.mainCell);
-                console.log(nextPlayerToPlay);
+                socket.emit('nextPlayer', ({roomId: data.player.roomId, nextPlayer: nextPlayerToPlay}));
                 setTurn({prevPlayerColor : mainCell.color, actualPlayerColor : nextPlayerToPlay });
                 setMainCell({id : 0, color : "", isPion : false});
                 DidPlayerWin(hexaMapState);
+                console.log(player);
+                socket.emit('saveMap', ({hexaMap: hexaMapState, roomId: (player as PlayerData).roomId}));
                 socket.off('move');
                 socket.off('select');
 
@@ -412,10 +424,19 @@ export default function GameMap() {
             socket.off('loadPlayer');
         });
 
+        socket.on('map', ({map, roomTurn}) => {
+            console.log(roomTurn);
+            const turnTMP = turn;
+            turnTMP.actualPlayerColor = roomTurn;
+            setTurn(turnTMP);
+            setHexaMapState(map);
+        })
+
     })
 
     const handleCellClick = (selectedCell) => {
         // Get player here
+        // if (selectedCell.color !== turn.actualPlayerColor) {
         if (selectedCell.color !== turn.actualPlayerColor || (player as PlayerData).color !== selectedCell.color) {
             alert("Ce n'est pas avous de jouer!");
             return;
