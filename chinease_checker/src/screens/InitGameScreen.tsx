@@ -1,63 +1,70 @@
-import React, { useEffect, useState } from 'react';
-import  StyleSheet  from 'react';
+import React, {useContext, useEffect, useState} from 'react';
+import StyleSheet from 'react';
 import io from 'socket.io-client';
 import {Container, Row, Form, Button} from 'react-bootstrap';
+import {useHistory} from 'react-router-dom';
+import {SocketContext} from '../context/socket';
 
 
 
 //IMPORT COMPONENTS
 import GameScreen from './GameScreen'
 
-const socket = io('http://localhost:9090', { transports : ['websocket'] , upgrade : false});
 
 
 export default function InitGameScreen() {
 
-  const [player, setPlayer] = useState({});
-  const [players, setPlayers] = useState([]);
-  const [playerID, setPlayerID] = useState("");
+    const [player, setPlayer] = useState({});
+    const [players, setPlayers] = useState([]);
+    const [playerID, setPlayerID] = useState("");
+    const history = useHistory();
+    const socket = useContext(SocketContext) || io();
 
 
-  useEffect(() => {
+    useEffect(() => {
 
-      socket.on('connectionbro', (data) => {
-          setPlayerID(data)
-          socket.off("connectionbro")
-      })
+        socket.on('connectionbro', (socketId) => {
+            setPlayerID(socketId)
+            socket.off("connectionbro")
+        })
 
-      socket.on('getPlayersArray', (data) => {
-        setPlayers([]);
-        setPlayers([...data]);
-        socket.off("getPlayersArray")
+        socket.on('getPlayersArray', (data) => {
+            setPlayers([]);
+            setPlayers([...data]);
+            socket.off("getPlayersArray")
+        })
     })
-    console.log(players);
-  })
 
-  const handleSelectColor = (color) => {
-    setPlayer({id : playerID, color : color});
-  }
+    const handleSelectColor = (color: string) => {
+        // Generate or get roomId here
+        setPlayer({id: playerID, color: color, roomId: 'test'});
+    }
 
-  const handleClickToPlay = () => {
-    socket.emit('newPlayer', player);
-  }
+    const handleClickToPlay = () => {
+        socket.emit('newPlayer', player);
+        socket.on('getRoom', (roomId) => {
+            console.log('roomID: ', roomId);
+            history.push('/game/' + roomId);
+        });
+    }
 
-  return (
-    <div>
-      hello {playerID}
-      <Form.Group controlId="exampleForm.ControlSelect1">
-        <Form.Label>Example select</Form.Label>
-        <Form.Control as="select" onChange={e => handleSelectColor(e.target.value)}>
-          <option>----Choisissez une couleur-----</option>
-          <option>Rouge</option>
-          <option>Marron</option>
-          <option>Vert</option>
-          <option>Rose</option>
-          <option>Jaune</option>
-          <option>Bleu</option>
-        </Form.Control>
-      </Form.Group>
-    <Button onClick={() => handleClickToPlay()}>Go play</Button>
-    </div>
-  );
+    return (
+        <div>
+            hello {playerID}
+            <Form.Group controlId="exampleForm.ControlSelect1">
+                <Form.Label>Example select</Form.Label>
+                <Form.Control as="select" onChange={e => handleSelectColor(e.target.value)}>
+                    <option>----Choisissez une couleur-----</option>
+                    <option  value={'red'}>Rouge</option>
+                    <option value={'brown'}>Marron</option>
+                    <option value={'green'}>Vert</option>
+                    <option value={'pink'}>Rose</option>
+                    <option value={'yellow'}>Jaune</option>
+                    <option value={'blue'}>Bleu</option>
+                </Form.Control>
+            </Form.Group>
+            <Button onClick={() => handleClickToPlay()}>Go play</Button>
+        </div>
+    );
 }
 

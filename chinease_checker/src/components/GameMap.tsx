@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Container, Row} from 'react-bootstrap';
 import './GameMap.css';
 import io from 'socket.io-client';
-import { fdatasync } from 'fs';
-
-console.log("test");
-const socket = io('http://localhost:9090', { transports : ['websocket'] , upgrade : false});
+import ScoreTab from "./ScoreTab";
+import {useParams} from 'react-router-dom';
+import {SocketContext} from "../context/socket";
+import {PlayerData} from "../interfaces/intefaces";
 
 // Cell Interface
 type Cell = {
@@ -366,6 +366,14 @@ export default function GameMap() {
     const [mainCell, setMainCell] = useState({id : 0, color : "", isPion : false});
     const [turn , setTurn] = useState({prevPlayerColor : null, actualPlayerColor : "red"})
     const [test, setTest] = useState("hello");
+    const [player, setPlayer] = useState({});
+    const socket = useContext(SocketContext) || io();
+
+    const {roomId} = useParams();
+
+    useEffect(() => {
+        socket.emit('getPlayer');
+    }, [])
 
     useEffect(() => {
 
@@ -380,7 +388,7 @@ export default function GameMap() {
             setHexaMapState([...hexaMapState]);
             socket.off('move');
             socket.off('select');
-        })
+        });
 
         socket.on('move', (data) => {
             let isMoveDone : boolean = SwitchPositionPions(data.mainCell, data.selectedEmptyCell, cellToMove, hexaMapState);
@@ -395,16 +403,24 @@ export default function GameMap() {
 
             }
             setHexaMapState([...hexaMapState]);
-        })
+        });
+
+        socket.on('loadPlayer', (player: PlayerData) => {
+            console.log(player);
+            setPlayer(player);
+            socket.off('getPlayer');
+            socket.off('loadPlayer');
+        });
 
     })
 
     const handleCellClick = (selectedCell) => {
-        if (selectedCell.color !== turn.actualPlayerColor) {
+        // Get player here
+        if (selectedCell.color !== turn.actualPlayerColor || (player as PlayerData).color !== selectedCell.color) {
             alert("Ce n'est pas avous de jouer!");
             return;
         }
-        socket.emit('select', {selectedCell});
+        socket.emit('select', {selectedCell, player});
     }
 
     const handleEmptyCellClick = (selectedEmptyCell) => {
@@ -412,11 +428,11 @@ export default function GameMap() {
             alert("Veuillez sélectionner en premier une cellule avec un pion pour pouvoir jouer.");
             return;
         }
-        socket.emit('move',  {selectedEmptyCell, mainCell});
+        socket.emit('move',  {selectedEmptyCell, mainCell, player});
     }
 
 
-    return (  
+    return (
       <Container fluid style={{display : "flex", justifyContent : "center", alignItems : "center"}}>
           <RenderHexaMap hexaMap={hexaMapState} updHexMap={handleCellClick} selectWhereTogo={handleEmptyCellClick}/>
       </Container>
