@@ -37,7 +37,7 @@ export default function InitGameScreen() {
 
     const handleSelectColor = (color: string) => {
         // Generate or get roomId here
-        setPlayer({id: playerID, color: color, roomId: 'test'});
+        setPlayer({id: playerID, color: color, roomId: 'room'});
     }
 
     const handleClickToPlay = () => {

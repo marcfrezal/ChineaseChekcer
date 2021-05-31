@@ -46,7 +46,7 @@ io.on('connection', (socket => {
         console.log('players ', playersArray);
         console.log('rooms ', rooms);
         socket.join(player.roomId);
-        socket.emit('getRoom', 'test');
+        socket.emit('getRoom', room.id);
         socket.emit("getPlayersArray", playersArray);
     });
 
