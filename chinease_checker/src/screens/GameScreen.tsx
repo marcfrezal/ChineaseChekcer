@@ -11,16 +11,16 @@ export default function GameScreen() {
   return (
     <Container fluid className="containerGameScreen" >
       <Row className="rowGameScreen">
-        {/* <Col md={5}>
-          <Container>
-            <Row className="rowGameTitle">Epinease Checker</Row>
-            <Row >
-              <Col className="cardGameScore">
-                <ScoreTab/>
-              </Col>
-            </Row>
-          </Container>
-        </Col> */}
+        {/*<Col md={5}>*/}
+        {/*  <Container>*/}
+        {/*    <Row className="rowGameTitle">Epinease Checker</Row>*/}
+        {/*    <Row >*/}
+        {/*      <Col className="cardGameScore">*/}
+        {/*        <ScoreTab/>*/}
+        {/*      </Col>*/}
+        {/*    </Row>*/}
+        {/*  </Container>*/}
+        {/*</Col>*/}
         <Col className="colGamePlate" md={12}>
           <div className="cardGamePlate shadow">
             <GameMap/>

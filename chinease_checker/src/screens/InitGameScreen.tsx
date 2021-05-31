@@ -43,7 +43,6 @@ export default function InitGameScreen() {
     const handleClickToPlay = () => {
         socket.emit('newPlayer', player);
         socket.on('getRoom', (roomId) => {
-            console.log('roomID: ', roomId);
             history.push('/game/' + roomId);
         });
     }

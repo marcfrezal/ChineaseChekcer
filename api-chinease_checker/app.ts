@@ -1,5 +1,5 @@
 import express from 'express';
-import {PlayerData} from "./interfaces/interfaces";
+import {PlayerData, Room} from "./interfaces/interfaces";
 
 const app = express();
 import http from 'http';
@@ -26,17 +26,26 @@ app.get('/', (req, res) => {
 })
 
 const playersArray: PlayerData[] = [];
+const rooms: Room[] = [];
 
 io.on('connection', (socket => {
     console.log(socket.id);
     console.log("Player connected : " + socket.id);
     socket.emit("connectionbro", socket.id);
 
-    socket.on("newPlayer", function(data: PlayerData) {
-        console.log(data);
-        playersArray.push(data);
-        console.log(playersArray);
-        socket.join('test');
+    socket.on("newPlayer", function(player: PlayerData) {
+        let room = rooms.find(room => room.id === player.roomId);
+        if (!room) {
+            room = {id: player.roomId, players: [], turn: player.color};
+            rooms.push(room);
+        }
+        if (!room.players.find(playerId => playerId === player.id))
+            room.players.push(player.id);
+        if (!playersArray.find(playerTmp => playerTmp.id === player.id))
+            playersArray.push(player);
+        console.log('players ', playersArray);
+        console.log('rooms ', rooms);
+        socket.join(player.roomId);
         socket.emit('getRoom', 'test');
         socket.emit("getPlayersArray", playersArray);
     });
@@ -53,22 +62,13 @@ io.on('connection', (socket => {
 
     socket.on('getPlayer', () => {
        const playerObj = playersArray.find(player => player.id === socket.id);
-       console.log('print', playerObj, socket.id);
        if (playerObj)
            io.to(playerObj.id).emit('loadPlayer', playerObj);
     });
 
     socket.on("disconnect", function(data) {
-        console.log("bye bye : " + socket.id )
-
         for (let i = 0; i != playersArray.length; i++) {
-            console.log(i);
-            console.log(playersArray[i].id);
-            console.log(socket.id);
-
             if (playersArray[i].id === socket.id) {
-                console.log(playersArray[i].id)
-
                 console.log("bye bye : " + socket.id )
                 playersArray.slice(i, 1);
             }

@@ -434,6 +434,14 @@ export default function GameMap() {
 
     return (
       <Container fluid style={{display : "flex", justifyContent : "center", alignItems : "center"}}>
+          <div style={{position: 'absolute', top: '6rem', left: '8rem', zIndex: 1}}>
+              You are playing:
+              <span style={{color: (player as PlayerData).color}}>{' ' + (player as PlayerData).color}</span>
+          </div>
+          <div style={{position: 'absolute', top: '8rem', left: '8rem', zIndex: 1}}>
+              It's the turn of:
+              <span style={{color: turn.actualPlayerColor}}>{' ' + turn.actualPlayerColor}</span>
+          </div>
           <RenderHexaMap hexaMap={hexaMapState} updHexMap={handleCellClick} selectWhereTogo={handleEmptyCellClick}/>
       </Container>
     );

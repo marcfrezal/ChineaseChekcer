@@ -3,3 +3,9 @@ export interface PlayerData {
     color: string;
     roomId: string;
 }
+
+export interface Room {
+    id: string;
+    turn: string;
+    players: string[];
+}
